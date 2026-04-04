@@ -2,22 +2,23 @@
 <html>
 <head>
     <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>Expense Tracker</h1>
+<div class="container">
 
-<form method="POST">
+<h1>💰 Expense Tracker</h1>
+
+<form method="POST" class="form">
     <input type="text" name="name" placeholder="Expense name" required>
     <input type="number" name="amount" placeholder="Amount" required>
     <button type="submit">Add</button>
 </form>
 
-<hr>
-
 <h2>Expenses</h2>
 
-<table border="1">
+<table>
 <tr>
     <th>Name</th>
     <th>Amount</th>
@@ -26,13 +27,15 @@
 {% for exp in expenses %}
 <tr>
     <td>{{ exp.name }}</td>
-    <td>{{ exp.amount }}</td>
+    <td>₹{{ exp.amount }}</td>
 </tr>
 {% endfor %}
 
 </table>
 
-<h3>Total: {{ total }}</h3>
+<h3>Total: ₹{{ total }}</h3>
+
+</div>
 
 </body>
 </html>
