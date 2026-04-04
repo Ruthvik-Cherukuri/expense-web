@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .card {
+            border-radius: 12px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand">
+            <i class="fas fa-wallet"></i> Expense Tracker
+        </span>
+        <a href="/logout" class="btn btn-danger">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</nav>
+
+<div class="container mt-4 fade-in">
+
+<h2 class="mb-3">
+    <i class="fas fa-chart-line"></i> Dashboard
+</h2>
+
+<!-- ADD EXPENSE -->
+<div class="card p-3 shadow-sm mb-3">
+    <form method="POST" class="row g-2">
+        <div class="col">
+            <input name="name" class="form-control" placeholder="Expense name" required>
+        </div>
+        <div class="col">
+            <input name="amount" type="number" class="form-control" placeholder="Amount" required>
+        </div>
+        <div class="col">
+            <button class="btn btn-success w-100">
+                <i class="fas fa-plus"></i> Add
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- TOTAL -->
+<div class="alert alert-primary d-flex align-items-center">
+    <i class="fas fa-money-bill-wave me-2"></i>
+    <h5 class="mb-0">Total: ₹{{ total }}</h5>
+</div>
+
+<!-- TABLE -->
+<div class="card p-3 shadow-sm mb-3">
+    <h5><i class="fas fa-list"></i> Expenses</h5>
+
+    <table class="table table-striped mt-2">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for e in expenses %}
+        <tr>
+            <td>{{ e[0] }}</td>
+            <td>₹{{ e[1] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- CHART -->
+<div class="card p-3 shadow-sm">
+    <h5><i class="fas fa-chart-bar"></i> Analytics</h5>
+    <canvas id="chart"></canvas>
+</div>
+
+</div>
+
+<script>
+let labels = [{% for e in expenses %}"{{ e[0] }}",{% endfor %}];
+let data = [{% for e in expenses %}{{ e[1] }},{% endfor %}];
+
+new Chart(document.getElementById("chart"), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Expenses',
+            data: data,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+        }]
+    }
+});
+</script>
+
+</body>
+</html>
