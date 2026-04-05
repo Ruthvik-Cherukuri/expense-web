@@ -11,114 +11,124 @@
 
     <!-- Chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .card {
-            border-radius: 12px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
 </head>
 
 <body class="bg-light">
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
     <div class="container">
-        <span class="navbar-brand">
-            <i class="fas fa-wallet"></i> Expense Tracker
-        </span>
-        <a href="/logout" class="btn btn-danger">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
+        <a class="navbar-brand" href="#"><i class="fas fa-wallet"></i> Expense Tracker</a>
+
+        <div class="ms-auto">
+            <span class="text-white me-3">👋 {{ session.user }}</span>
+            <a href="/logout" class="btn btn-danger btn-sm">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
     </div>
 </nav>
 
-<div class="container mt-4 fade-in">
+<div class="container mt-4">
 
-<h2 class="mb-3">
-    <i class="fas fa-chart-line"></i> Dashboard
-</h2>
+<!-- DASHBOARD TITLE -->
+<h3 class="mb-4">📊 Dashboard</h3>
 
 <!-- ADD EXPENSE -->
-<div class="card p-3 shadow-sm mb-3">
-    <form method="POST" class="row g-2">
-        <div class="col">
-            <input name="name" class="form-control" placeholder="Expense name" required>
-        </div>
-        <div class="col">
-            <input name="amount" type="number" class="form-control" placeholder="Amount" required>
-        </div>
-        <div class="col">
-            <button class="btn btn-success w-100">
-                <i class="fas fa-plus"></i> Add
-            </button>
-        </div>
-    </form>
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="POST" class="row g-3">
+            <div class="col-md-5">
+                <input name="name" class="form-control" placeholder="Expense name" required>
+            </div>
+            <div class="col-md-4">
+                <input name="amount" type="number" class="form-control" placeholder="Amount" required>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-success w-100">
+                    <i class="fas fa-plus"></i> Add Expense
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<!-- TOTAL -->
-<div class="alert alert-primary d-flex align-items-center">
-    <i class="fas fa-money-bill-wave me-2"></i>
-    <h5 class="mb-0">Total: ₹{{ total }}</h5>
+<!-- STATS -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary shadow-sm">
+            <div class="card-body text-center">
+                <h6>Total Expense</h6>
+                <h3>₹{{ total }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SEARCH -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="GET" class="row">
+            <div class="col-md-10">
+                <input type="text" name="search" class="form-control" placeholder="🔍 Search expenses...">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100">Search</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- TABLE -->
-<div class="card p-3 shadow-sm mb-3">
-    <h5><i class="fas fa-list"></i> Expenses</h5>
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="mb-3"><i class="fas fa-list"></i> Expenses</h5>
 
-    <table class="table table-striped mt-2">
-        <thead class="table-dark">
-            <tr>
-                <th>Name</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Amount</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
 
-        <tbody>
-        {% for e in expenses %}
-        <tr>
-            <td>{{ e[0] }}</td>
-            <td>₹{{ e[1] }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                <tbody>
+                {% for e in expenses %}
+                <tr>
+                    <td>{{ e[1] }}</td>
+                    <td>₹{{ e[2] }}</td>
+                    <td class="text-center">
+                        <a href="/edit/{{ e[0] }}" class="btn btn-warning btn-sm me-2">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="/delete/{{ e[0] }}" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- CHART -->
-<div class="card p-3 shadow-sm">
-    <h5><i class="fas fa-chart-bar"></i> Analytics</h5>
-    <canvas id="chart"></canvas>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5><i class="fas fa-chart-bar"></i> Analytics</h5>
+        <canvas id="chart"></canvas>
+    </div>
 </div>
 
 </div>
 
 <script>
-let labels = [{% for e in expenses %}"{{ e[0] }}",{% endfor %}];
-let data = [{% for e in expenses %}{{ e[1] }},{% endfor %}];
+let labels = [{% for e in expenses %}"{{ e[1] }}",{% endfor %}];
+let data = [{% for e in expenses %}{{ e[2] }},{% endfor %}];
 
 new Chart(document.getElementById("chart"), {
     type: 'bar',
@@ -127,7 +137,7 @@ new Chart(document.getElementById("chart"), {
         datasets: [{
             label: 'Expenses',
             data: data,
-            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+            backgroundColor: '#0d6efd'
         }]
     }
 });

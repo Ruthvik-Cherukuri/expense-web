@@ -5,7 +5,7 @@ import os
 app = Flask(__name__, template_folder="templates")
 app.secret_key = "secret"
 
-# ✅ Database connection (FIXED)
+# ✅ Database connection
 def get_db():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(base_dir, "database.db")
@@ -68,7 +68,7 @@ def login():
 
     return render_template("login.html")
 
-# ✅ Dashboard
+# ✅ Dashboard (UPDATED WITH FILTER)
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
     if "user" not in session:
@@ -86,16 +86,63 @@ def dashboard():
         conn.commit()
         conn.close()
 
+    # 🔍 FILTER LOGIC ADDED
+    search = request.args.get("search", "")
+
     conn = get_db()
     data = conn.execute(
-        "SELECT name, amount FROM expenses WHERE user=?",
-        (session["user"],)
+        "SELECT id, name, amount FROM expenses WHERE user=? AND name LIKE ?",
+        (session["user"], f"%{search}%")
     ).fetchall()
     conn.close()
 
-    total = sum([row[1] for row in data])
+    total = sum([row[2] for row in data])
 
     return render_template("dashboard.html", expenses=data, total=total)
+
+# 🗑️ DELETE FEATURE ADDED
+@app.route("/delete/<int:id>")
+def delete(id):
+    if "user" not in session:
+        return redirect("/")
+
+    conn = get_db()
+    conn.execute(
+        "DELETE FROM expenses WHERE id=? AND user=?",
+        (id, session["user"])
+    )
+    conn.commit()
+    conn.close()
+
+    return redirect("/dashboard")
+
+# ✏️ EDIT FEATURE ADDED
+@app.route("/edit/<int:id>", methods=["GET", "POST"])
+def edit(id):
+    if "user" not in session:
+        return redirect("/")
+
+    conn = get_db()
+
+    if request.method == "POST":
+        name = request.form["name"]
+        amount = request.form["amount"]
+
+        conn.execute(
+            "UPDATE expenses SET name=?, amount=? WHERE id=? AND user=?",
+            (name, amount, id, session["user"])
+        )
+        conn.commit()
+        conn.close()
+        return redirect("/dashboard")
+
+    expense = conn.execute(
+        "SELECT * FROM expenses WHERE id=? AND user=?",
+        (id, session["user"])
+    ).fetchone()
+
+    conn.close()
+    return render_template("edit.html", expense=expense)
 
 # ✅ Logout
 @app.route("/logout")
